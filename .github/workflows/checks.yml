@@ -1,0 +1,33 @@
+---
+name: Checks
+
+# on defines a trigger
+on: [push]
+# anytime we do commit push, git will execute the checks we specify here
+
+jobs:
+  # test-lint is an ID for this job in case we need to reference
+  test-lint:
+    name: Test and Lint
+    # Specify the runner on github actions servers
+    # ubuntu-20.04 already has docker-compose installed
+    runs-on: ubuntu-20.04
+    steps:
+      # 1st step: login to docker hub
+      - name: Login to Docker Hub
+        # uses: specifies an already available action on github actions
+        uses: docker/login-action@v1
+        # with: specifies the arguments used with the action
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # 2nd step: checkout the code
+      - name: Checkout
+        # We need to checkout the code becuase we need to lint and run tests on it
+        uses: actions/checkout@v2
+      # 3rd step: run unit tests
+      - name: Test
+        run: docker-compose run --rm app sh -c "python manage.py test"
+      # 4th step: lint the code
+      - name: Lint
+        run: docker-compose run --rm app sh -c "flake8"

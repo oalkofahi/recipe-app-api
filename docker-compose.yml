@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  app:
+    build: 
+      # Specify the directory where we want to build our Dockerfile
+      context: .
+      args:
+        # If we are running through docker-compose (which we will most of the time for development)
+        # Then, set the DEV argument defined in the Dockerfile (and by default set to false there)
+        - DEV=true
+    ports:
+      # Specify ports mappings
+      # This says: port 8000 on our machine is mapped to port 8000 on the Docker image
+      - "8000:8000"
+    volumes:
+      # Mapping directories from our system to the container
+      - ./app:/app
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

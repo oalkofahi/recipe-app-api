@@ -1,0 +1,8 @@
+[flake8]
+# Exclude the file for which we don't want to apply linting via flake8
+# Some of these are Django generated files that we did not write ourselves
+exclude = 
+    migrations,
+    __pycache__,
+    manage.py,
+    settings.py
