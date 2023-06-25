@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # Define the application service
   app:
     build: 
       # Specify the directory where we want to build our Dockerfile
@@ -18,3 +19,37 @@ services:
       - ./app:/app
     command: >
       sh -c "python manage.py runserver 0.0.0.0:8000"
+    # Define app environment variable to aid it in connecting to the DB
+    # Should match what we have in the db service
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devbd
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    # Add a dependency on the db ==> app cannot run if db does not run
+    depends_on:
+      - db
+  
+  # Define the Database service
+  db:
+    # Specify the docker image to be used
+    # You can find other images on docker hub
+    # This one is: https://hub.docker.com/layers/library/postgres/13-alpine/images/sha256-566a93aa006f39d6789eba2c89c2bd01dc0e169c7a0e3293e788698715544271?context=explore
+    image: postgres:13-alpine
+    volumes:
+      # Choose the volume from below and specify the path on the container
+      # The path is specified in the documentation
+      - dev-db-data:/var/lib/postgresql/data
+    # Define environment variable to set the initial DB configuration
+    # The credentials are specified here necause this is for development purposes
+    # If this is going to be deployed, your credintials MUST NOT be hardcoded like this
+    environment:
+      - POSTGRES_DB=devbd
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+# Define volumes
+# Pay attention to the indentation how it lines up with services
+volumes:
+  # Define our database volume
+  dev-db-data:

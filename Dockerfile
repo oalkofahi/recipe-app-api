@@ -27,13 +27,20 @@ ARG DEV=false
 # Try to reduce the image layers to keep our images as lightweight as possible
 # So writing the command the way it was done below is more efficient
 # Note that we added a user in the last command to avoid running our application as root
+# Note that .tmp-build-deps below is used to group all the dependencies build-base postgresql-dev musl-dev
+# These dependencies are needed to install postgresql-client but are not needed afterwards
+# That is why they are removed later by apk del .tmp-build-deps && \
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache --virtual .tmp-build-deps \
+        build-base postgresql-dev musl-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV = "true" ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
+    apk del .tmp-build-deps && \
     adduser \ 
         --disabled-password \
         --no-create-home \
