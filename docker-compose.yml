@@ -18,7 +18,9 @@ services:
       # Mapping directories from our system to the container
       - ./app:/app
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db && 
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     # Define app environment variable to aid it in connecting to the DB
     # Should match what we have in the db service
     environment:
